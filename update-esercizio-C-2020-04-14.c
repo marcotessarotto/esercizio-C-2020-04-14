@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,18 +50,17 @@ if (contact->name == NULL || contact->phone == NULL) {
 }
 
 int cmp_contact(contact_type *c1, contact_type *c2){
-	printf("_______compare_______\n");
+	
 	int result = 0;
-	printf("Confrontiamo i contatti %s e %s", c1->name, c2->name);
-	if (c1->name == c2->name && c1->phone == c2->phone){
-		printf("I due contatti sono uguali\n");
+	result = strcmp(c1->name, c2->name);
+	if(result != 0){
+		return result;
 	}else{
-		result = c1->id - c2->id;
-		printf("I due contatti non sono uguali\n");
+		result = strcmp(c1->phone, c2->phone);
 	}
 
-
 	return result;
+
 }
 
 contact_type * address_book[ADDRESS_BOOK_SIZE];
@@ -183,11 +183,10 @@ void sort_by_name(){
 
 	for (int i = 0; i<10; i++){
 
-		if (address_book[i] != NULL){
-		int res = strcmp(address_book[pos]->name, address_book[i]->name);
+		if (address_book[i] != NULL){			
+			int res = cmp_contact(address_book[pos], address_book[i]);
 			if(res > 0){
-				pos = i;
-
+			pos = i;	
 			}
 		}
 	}
@@ -271,6 +270,8 @@ int main(int argc, char *argv[]) {
 	//ordino per nome
 	sort_by_name();
 
+	int res = cmp_contact(antonio, barbara);
+	printf("res = %d\n\n", res);
 	//stampo la rubrica ordinata
 	print_address_book();
 
