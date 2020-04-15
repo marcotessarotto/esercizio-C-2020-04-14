@@ -34,6 +34,7 @@ void sort_by_name();
 
 int main(int argc, char *argv[]) {
 
+	// main requst (1)
 	char *contacts[] = {	"dino",		"+391239",
 							"filippo",	"+391239",
 							"barbara",	"+391239",
@@ -54,6 +55,7 @@ int main(int argc, char *argv[]) {
 		add_to_address_book(contact);
 	}
 
+	// main requst (2)
 	contact_type * antonio = create_contact("antonio", "+391234");
 	int index_of_antonio_in_address_book = search_in_address_book(antonio);
 	if(index_of_antonio_in_address_book >= 0){
@@ -63,6 +65,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
+	// main requst (3)
 	contact_type * pino = create_contact("pino", "+399999");
 	if (pino == NULL) {
 		printf("errore in create_contact!\n");
@@ -77,6 +80,7 @@ int main(int argc, char *argv[]) {
 	}
 	putchar('\n');
 
+	// main requst (4)
 	antonio = create_contact("antonio", "+391234");
 	if (antonio == NULL) {
 		printf("errore in create_contact!\n");
@@ -84,8 +88,10 @@ int main(int argc, char *argv[]) {
 	}
 	add_to_address_book(antonio);
 
+	// main requst (5)
 	sort_by_name();
 
+	// main requst (6)
 	for(int i=0 ; i<ADDRESS_BOOK_SIZE ; i++){
 		if(address_book[i] != NULL){
 			print_contact(address_book[i]);
@@ -205,14 +211,28 @@ void swap_contacts(contact_type *x, contact_type *y){
 
 // bubble sorto applicato ad una array di contatti
 void bubble_sort(contact_type ** array, int array_dimension) {
-	int upperLimit = array_dimension;
+	// example: array = [c1, c2 , NULL, c3, c4, NULL, NULL]
+	int upperLimit = array_dimension; // in the example upperLimit = 7
+	//optimization, exclude from the bubble sorts all the final part of NULL cells from address_book
 	for(int i=array_dimension-1 ; i>=0 ; i--){
 		if(array[i] != NULL){
 			upperLimit = i+1;
 			break;
 		}
 	}
+	// in the example upperLimit = 5
 
+	// swap all the null contact and put on the bottom of the address_book
+	for(int i=0 ; i<upperLimit ; i++){
+		if(array[i] == NULL){
+			array[i] = array[upperLimit-1];
+			array[upperLimit-1] = NULL;
+			upperLimit--;
+		}
+	}
+	// in the example upperLimit = 4 and array = [c1, c2, c4, c3, NULL, NULL, NULL]
+
+	//start bubble sort
 	while(upperLimit > 1){
 		for(int i=1 ; i<upperLimit ; i++){
 		   if(compare_contacts( array[i-1], array[i]) > 0){
@@ -228,4 +248,3 @@ void bubble_sort(contact_type ** array, int array_dimension) {
 void sort_by_name(){
 	bubble_sort(address_book, ADDRESS_BOOK_SIZE);
 }
-
