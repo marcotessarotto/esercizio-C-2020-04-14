@@ -270,8 +270,6 @@ int main(int argc, char *argv[]) {
 	//ordino per nome
 	sort_by_name();
 
-	int res = cmp_contact(antonio, barbara);
-	printf("res = %d\n\n", res);
 	//stampo la rubrica ordinata
 	print_address_book();
 
