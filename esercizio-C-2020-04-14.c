@@ -44,16 +44,22 @@ int compare_contacts(contact_type * c1, contact_type * c2)
 	}
 	else
 	{
-		if(strcmp(c1->name, c2->name)<0 && c1!=NULL && c2!=NULL)
-
-			return 1;
-		else
+		for(int i = 0 ; i<NAME_LEN; i++)
 		{
-			if(c1==NULL || c2==NULL)
-				return -1;
-			return -2;
+			if(c1->name[i]!=c2->name[i])
+				return c1->name[i]- c2->name[i];
+
+		}
+
+		for(int j=0; j<PHONE_LEN; j++)
+		{
+			if(c1->phone[j]!=c2->phone[j])
+				return c1->phone[j]- c2->phone[j];
+
 		}
 	}
+
+			return -1;
 
 }
 
@@ -123,7 +129,7 @@ void sort_by_name()
 			  if (address_book[j] == NULL && address_book[j+1] != NULL)
 				  swap_contacts(j,j+1);
 			  else if (address_book[j] != NULL && address_book[j + 1] != NULL)
-				  if (compare_contacts(address_book[j],address_book[j + 1])==-2)
+				  if (compare_contacts(address_book[j],address_book[j + 1])>0)
 					  swap_contacts(j,j+1);
 	      }
 
@@ -257,6 +263,31 @@ int main(int argc, char *argv[]) {
 
 
 
+
+
+
+
+		contact_type * pinolo = create_contact("pino", "+329999");
+		if (pino == NULL) {
+			printf("errore in create_contact!\n");
+			exit(EXIT_FAILURE);
+		}
+		int l=add_to_address_book(pinolo);
+			if(l>=0)
+			{
+				printf("Contatto Pino inserito nella posizione %d\n", l);
+			}
+			else
+				printf("errore (i.e. non c'è più spazio in address_book o c == NULL)");
+
+
+
+
+
+
+
+
+
 		printf("\n\nStampa rubrica\n");
 
 	for(int i=0; i<ADDRESS_BOOK_SIZE; i++)
@@ -291,7 +322,6 @@ int main(int argc, char *argv[]) {
 	free(enrico);
 	free(chiara);
 
+
 	return 0;
 }
-
-
