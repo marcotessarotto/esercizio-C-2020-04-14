@@ -1,0 +1,280 @@
+// Diaa Nehme  IN0500345  esercizio20200414
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define NAME_LEN 64
+#define PHONE_LEN 20
+#define ADDRESS_BOOK_SIZE 256
+
+unsigned int counter = 0;
+typedef
+	struct {
+		unsigned int id; // id contact number (unique value)
+		char name[NAME_LEN + 1]; // person name
+		char phone[PHONE_LEN + 1]; // phone number
+	} contact_type;
+
+contact_type * address_book[ADDRESS_BOOK_SIZE];
+
+// Create Contact Function
+contact_type * create_contact(char * name, char * phone){
+
+	contact_type * person;
+
+	person = malloc(sizeof(contact_type));
+	if( person == NULL){
+		return NULL;
+	}
+
+	person->id = counter;
+	strcpy(person->name, name);
+	strcpy(person->phone, phone);
+
+	counter++;
+	return person;
+
+}
+
+// Print Contact Function
+void print_contact(contact_type * person){
+
+	printf("Person id: %u, name: %s, phone: %s\n",person->id, person->name, person->phone);
+}
+
+// Compare Contacts Function
+int compare_contacts(contact_type * c1, contact_type * c2){
+	if(c1 == NULL || c2 == NULL)
+		return -1;
+
+	int resultName = strcmp(c1->name, c2->name);
+	int resultPhone = strcmp(c1->phone, c2->phone);
+
+	if(resultName != 0){	// checking names
+		if(resultName < 0)	// check if c1's name is ordered before c2's name
+			return -100;
+		else
+			return 100;
+	}
+
+
+	if(resultPhone != 0){	// cheking phone numbers
+		if(resultPhone < 0)
+			return -100;
+		else
+			return 100;
+	}
+	return 0;
+}
+
+// Add Contact Function
+int add_to_address_book(contact_type * c){
+	if(c == NULL)
+		return -1;
+
+	int position = 0;
+	for(int i = 0; i < ADDRESS_BOOK_SIZE; i++){
+		if(address_book[i] == NULL){	// cheking of free position
+
+			address_book[i] = c;
+			position = i;
+			return position;
+		}
+	}
+
+	return -1;	// if address_book if full
+}
+
+// Remove Contact Function
+int remove_from_address_book(contact_type * c){
+	if(c == NULL)
+		return -1;
+
+	int position = 0;
+	for(int i = 0; i < ADDRESS_BOOK_SIZE; i++){
+		if(compare_contacts(c, address_book[i]) == 0){
+			position = i;
+			return position;
+		} else return -1; // if c is not found
+	}
+
+	address_book[position] = NULL;
+
+	return position;
+}
+
+// Search Contact Function
+int search_in_address_book(contact_type * c){
+	if (c == NULL)
+		return -1;
+
+	int position = 0;
+	for(int i = 0; i < ADDRESS_BOOK_SIZE; i++){
+		if(compare_contacts(c, address_book[i]) == 0){
+			position = i;
+			return position;
+		} else return -1; // if c is not found
+	}
+}
+
+// Sort Contacts Function
+void sort_by_name(){
+	int N = ADDRESS_BOOK_SIZE;
+	do{
+		int newN = 0;
+		for(int i = 1; i < N; i++){
+			if(compare_contacts(address_book[i - 1], address_book[i]) > 0){
+				swap_contacts(address_book[i-1], address_book[i]);
+				newN = i;
+			}
+		}
+		N = newN;
+	} while(N > 1);
+}
+
+// Swap Contacts Function
+void swap_contacts(contact_type *x, contact_type *y){
+	contact_type temp = *x;
+	*x = *y;
+	*y = temp;
+}
+
+int main(int argc, char *argv[]) {
+
+	contact_type * dino = create_contact("dino", "+391237");
+	contact_type * enrico = create_contact("enrico", "+391238");
+	contact_type * filippo = create_contact("filippo", "+391239");
+	contact_type * barbara = create_contact("barbara", "+391235");
+	contact_type * antonio = create_contact("antonio", "+391234");
+	contact_type * chiara = create_contact("chiara", "+391236");
+
+	if (dino == NULL) {
+		printf("Error creating contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (filippo == NULL) {
+		printf("Error creating contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (barbara == NULL) {
+		printf("Error creating contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (antonio == NULL) {
+		printf("Error creating contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (enrico == NULL) {
+		printf("Error creating contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (chiara == NULL) {
+		printf("Error creating contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	int result;
+	result = add_to_address_book(dino);
+
+	if(result == -1){
+		printf("Error adding contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	result = add_to_address_book(filippo);
+	if(result == -1){
+		printf("Error adding contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	result = add_to_address_book(barbara);
+	if(result == -1){
+		printf("Error adding contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	result = add_to_address_book(antonio);
+	if(result == -1){
+		printf("Error adding contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	result = add_to_address_book(enrico);
+	if(result == -1)
+		printf("Error adding contact!\n");
+
+	result = add_to_address_book(chiara);
+	if(result == -1){
+		printf("Error adding contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+
+	contact_type * newContact1 = create_contact("antonio", "+391234");
+
+	if (newContact1 == NULL) {
+		printf("Error creating contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	result = search_in_address_book(newContact1);
+
+	if(result != -1){
+		result = remove_from_address_book(newContact1);
+		printf("Delete contact successfully!\n");
+	}
+	else{
+		printf("Contact doesn't exist!\n");
+	}
+
+
+	contact_type * newContact2 = create_contact("pino", "+399999");
+
+	if (newContact2 == NULL) {
+		printf("Error creating contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	result = add_to_address_book(newContact2);
+	if(result == -1){
+		printf("Error adding contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	printf("\nContacts:\n");
+
+	for(int i = 0; i < ADDRESS_BOOK_SIZE; i++){
+		if(address_book[i] != NULL)
+			print_contact(address_book[i]);
+	}
+
+
+	contact_type * newContact3 = create_contact("antonio", "+391234");
+
+	if (newContact3 == NULL) {
+		printf("Error creating contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	result = add_to_address_book(newContact3);
+	if(result == -1){
+		printf("Error adding contact!\n");
+		exit(EXIT_FAILURE);
+	}
+
+
+	sort_by_name();
+
+
+	printf("\nContacts ordered by name:\n");
+	for(int i = 0; i < ADDRESS_BOOK_SIZE; i++){
+		if(address_book[i] != NULL)
+			print_contact(address_book[i]);
+	}
+}
