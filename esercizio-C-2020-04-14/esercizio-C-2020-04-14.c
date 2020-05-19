@@ -14,8 +14,6 @@ typedef struct {
 
 int id_counter=0;
 
-int pos=0;
-
 void print_contact(contact_type * person) {
 	printf("person: id=%d, name='%s', phone='%s'\n", person->id, person->name, person->phone);
 }
@@ -43,10 +41,6 @@ contact_type * create_contact(char * name, char * phone) {
 	return result;
 }
 
-// se address_book[i] == NULL, vuole dire che la cella è utilizzabile
-// per conservare l'indirizzo di un contatto
-
-
 // confronta due contatti:
 // due contatti sono uguali se e solo se c1->name è uguale a c2->name
 // e c1->phone è uguale a c2->phone
@@ -57,9 +51,9 @@ contact_type * create_contact(char * name, char * phone) {
 // ovvero FATE COME FA STRCMP (vedete man strcmp)
 // NOTA BENE: se c1 == NULL or c2 == NULL, restituisce -1
 int compare_contacts(contact_type * c1, contact_type * c2){
-	int ritorno;
+	int ritorno = -1;
 
-	if(*c1->name == *c2->name && *c1->phone == *c2->phone)
+	if(c1->name == c2->name && c1->phone == c2->phone)
 		ritorno = 0;
 	else if(c1 != NULL && c2 != NULL)
 		ritorno = strcmp(c1->name, c2->name);
@@ -70,17 +64,24 @@ int compare_contacts(contact_type * c1, contact_type * c2){
 
 // aggiunge il contatto c all'array address_book array
 // la funzione NON controlla se il contatto è già presente;
-// ma cerca la prima cella libero nell'array
+// ma cerca la prima cella libera nell'array
 // return value:
 // >=0: posizione nell'array address_book dove è stato inserito c
 // -1: errore (i.e. non c'è più spazio in address_book o c == NULL)
+
+// se address_book[i] == NULL, vuole dire che la cella è utilizzabile
+// per conservare l'indirizzo di un contatto
 int add_to_address_book(contact_type * c){
 	int posizione = -1;
+	int i=0;
 
-	if(pos < ADDRESS_BOOK_SIZE && c!= NULL && address_book[pos] != NULL){
-		address_book[pos] = c;
-		posizione = pos;
-		pos++;
+	while(address_book[i] != NULL){
+		i++;
+	}
+
+	if(i < ADDRESS_BOOK_SIZE && c!= NULL){
+		address_book[c->id] = c;
+		posizione = c->id;
 	}
 
 	return posizione;
@@ -94,17 +95,19 @@ int add_to_address_book(contact_type * c){
 // -1: contatto c non trovato
 int search_in_address_book(contact_type * c){
 
-	int res;
+	int res = -1;
+	int i = 0;
 
-	for(int i=0; i<pos; i++){
+	while(compare_contacts(c, address_book[i]) != 0){
+		i++;
 
-		if(compare_contacts(c, address_book[i]) == 0){
-			res = i;
-			i=pos;
-		}
-		else
-			res=-1;
+		if(i == ADDRESS_BOOK_SIZE)
+			break;
 	}
+
+	if(i != ADDRESS_BOOK_SIZE)
+		res = i;
+
 	return res;
 }
 
@@ -114,27 +117,13 @@ int search_in_address_book(contact_type * c){
 // -1: non ho trovato c, quindi non ho cancellato nessun contatto
 int remove_from_address_book(contact_type * c){
 
-	int posiz;
+	int posiz = -1;
 
 	if((posiz = search_in_address_book(c)) != -1){
 		address_book[posiz] = NULL;
 	}
-	else{
-		posiz = -1;
-	}
+
 	return posiz;
-}
-//prende l'indirizzo della prima variabile e scambia le posizioni delle variabili
-void swap_address(contact_type * c1, contact_type * c2){
-
-	contact_type t;
-
-	//t = calloc(1, sizeof(contact_type));
-
-	t = *c1;
-	*c1 = *c2;
-	*c2 = t;
-
 }
 
 // funzione che fa il sort dei contatti in address_book, utilizzando compare_contacts()
@@ -143,17 +132,47 @@ void sort_by_name(){
 	int compare;
 	int contascambi=0;
 
-	for(int i=0; i<pos-1; i++){
+	int i=0;
 
-		compare = compare_contacts(address_book[i], address_book[i+1]);
+	while(i<id_counter-1){
+
+		int b = i+1;
+
+		compare = compare_contacts(address_book[i], address_book[b]);
+
+
+		while(compare == -1 && b<=id_counter-1){//uno dei contatti è NULL
+
+			if(address_book[i] == NULL)
+				compare = 0;
+
+			else if(address_book[b] == NULL){
+				b++;
+				compare = compare_contacts(address_book[i], address_book[b]);
+
+			}
+			else
+				break;
+		}
+
 
 		if(compare > 0){
-			swap_address(address_book[i], address_book[i+1]);
+
+			contact_type *t = address_book[i+1];
+
+			address_book[i+1] = address_book[i];
+			address_book[i] = t;
+
 			contascambi++;
 		}
-		if(i == pos-2)
-			if(contascambi>0)
-				i=0;
+
+		//printf("%d\n", contascambi);
+
+		if(i == id_counter-2 && contascambi>0){
+			i=-1;
+			contascambi=0;
+		}
+		i++;
 	}
 }
 
@@ -176,14 +195,13 @@ int main(){
 
 	//2 - cercare il contatto "antonio","+391234"
 	//e se trovato, rimuoverlo
-	if(search_in_address_book(anto) != -1)
-		remove_from_address_book(anto);
+	remove_from_address_book(anto); //il search è già compreso nella funzione
 
 	add_to_address_book(create_contact("pino","+399999"));
 
 	//3 - creare ed aggiungere il contatto "pino","+399999"
 	//e scrivere a video tutta la rubrica telefonica (non le celle vuote)
-	for(int i=0; i<pos; i++){
+	for(int i=0; i<id_counter; i++){
 		if(address_book[i] != NULL)
 			print_contact(address_book[i]);
 	}
@@ -197,9 +215,9 @@ int main(){
 	//6 - scrivere a video tutta la rubrica telefonica (non le celle vuote)
 	//il risultato deve essere ordinato
 
-	for(int i=0; i<pos; i++){
-			if(address_book[i] != NULL)
-				print_contact(address_book[i]);
+	for(int i=0; i<id_counter; i++){
+		if(address_book[i] != NULL)
+			print_contact(address_book[i]);
 	}
 
 	return 0;
